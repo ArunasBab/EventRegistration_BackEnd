@@ -9,7 +9,7 @@ const app = express();
 
 app.get("/", (req, res) => {
   res.json({
-    message: "Hello world",
+    message: "Hello world dar kazkas",
   });
 });
 
