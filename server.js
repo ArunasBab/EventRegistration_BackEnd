@@ -4,11 +4,15 @@ import cors from "cors";
 
 dotenv.config();
 
-const PORT = process.env.PORT;
+const { PORT, CORS_ORIGIN } = process.env;
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: CORS_ORIGIN,
+  })
+);
 
 app.use(express.json());
 
