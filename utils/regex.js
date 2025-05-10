@@ -1,3 +1,3 @@
-export const passwordRegex = new RegExp(
-  "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])"
-);
+export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;

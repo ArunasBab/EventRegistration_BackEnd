@@ -1,4 +1,4 @@
-import UserModel from "../models/userModel.js";
+import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -8,31 +8,27 @@ dotenv.config();
 const { JWT_SECRET } = process.env;
 
 export async function registerUser(req, res) {
-  const body = req.body;
+  const { name, lastName, email, password } = req.body;
 
   try {
-    const hashedPassword = await bcrypt.hash(body.password, 10);
+    const existingUser = await User.findOne({ email });
+    if (existingUser)
+      return res.status(400).json({ error: "El. paštas jau registruotas" });
 
-    const newUser = new UserModel({
-      ...body,
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      name,
+      lastName,
+      email,
       password: hashedPassword,
     });
 
-    // Tikrina ar email'as jau egzistuoja
-    const existingUser = await UserModel.findOne({ email: body.email });
-    if (existingUser) {
-      return res.status(400).json({
-        error: "User with email already exists",
-      });
-    }
-
     await newUser.save();
 
-    res.status(201).json(newUser);
+    res.status(201).json({ message: "Registracija sėkminga" });
   } catch (error) {
-    res.status(500).json({
-      error: error.message,
-    });
+    res.status(500).json({ error: error.message });
   }
 }
 
@@ -40,46 +36,23 @@ export async function loginUser(req, res) {
   const { email, password } = req.body;
 
   try {
-    const user = await UserModel.findOne({ email });
-
-    if (!user) {
-      return res.status(400).json({
-        error: "User with email does not exist",
-      });
-    }
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ error: "Vartotojas nerastas" });
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect)
+      return res.status(400).json({ error: "Neteisingas slaptažodis" });
 
-    if (isPasswordCorrect) {
-      const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, {
-        expiresIn: "1h",
-      });
-
-      return res.json({
-        token,
-        user,
-      });
-    } else {
-      res.status(400).json({
-        error: "Invalid password",
-      });
-    }
-  } catch (error) {
-    res.status(500).json({
-      error: error.message,
+    const token = jwt.sign({ id: user._id }, JWT_SECRET, {
+      expiresIn: "1h",
     });
+
+    res.json({ token, user: { id: user._id, email: user.email } });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 }
 
 export async function logoutUser(req, res) {
-  try {
-    res.status(200).json({
-      message: "Sėkmingai atsijungėte",
-      token: null,
-    });
-  } catch (error) {
-    res.status(500).json({
-      error: error.message,
-    });
-  }
+  res.status(200).json({ message: "Atsijungta sėkmingai" });
 }
