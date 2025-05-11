@@ -18,19 +18,10 @@ const app = express();
 
 app.use(
   cors({
-    origin: "*",
-    credentials: false,
+    origin: CORS_ORIGIN,
+    credentials: true,
   })
 );
-
-// Laikinai atjungta CORS, nes sukelia klaidų su React frontend
-
-// app.use(
-//   cors({
-//     origin: CORS_ORIGIN,
-//     credentials: true,
-//   })
-// );
 
 app.use(express.json());
 
