@@ -23,6 +23,15 @@ app.use(
   })
 );
 
+// Laikinai atjungta CORS, nes sukelia klaidų su React frontend
+
+// app.use(
+//   cors({
+//     origin: CORS_ORIGIN,
+//     credentials: true,
+//   })
+// );
+
 app.use(express.json());
 
 app.use(router);
