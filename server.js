@@ -17,10 +17,13 @@ mongoose
 const app = express();
 
 app.use(
-  cors({
-    origin: CORS_ORIGIN,
-    credentials: true,
-  })
+  app.use(
+    cors({
+      origin: "*", // Leidžia bet kokią kilmę
+      methods: "GET,POST,DELETE", // Leidžiami metodai
+      credentials: false, // Išjungia autorizaciją
+    })
+  )
 );
 
 app.use(express.json());
